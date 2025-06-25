@@ -1,0 +1,6 @@
+Flask==2.0.3
+Flask_Cors==5.0.0
+gradio_client==1.10.3
+Pillow==11.2.1
+python-dotenv==1.1.1
+Werkzeug==2.0.3

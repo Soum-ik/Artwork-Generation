@@ -1,6 +1,0 @@
-Flask
-requests
-Pillow
-opencv-python-headless
-numpy
-huggingface_hub

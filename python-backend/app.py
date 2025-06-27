@@ -96,7 +96,7 @@ def generate_base_image():
     try:
         start_time = time.time()
         app.logger.info(f"Generating base image with prompt: '{BASE_IMAGE_PROMPT}'")
-        base64_image = call_hf_space_for_image(BASE_IMAGE_PROMPT, DEFAULT_NEGATIVE_PROMPT)
+        base64_image =  call_hf_space_for_image(BASE_IMAGE_PROMPT, DEFAULT_NEGATIVE_PROMPT)
         app.logger.info(f"Base image generated as base64.")
         end_time = time.time()
         time_taken = end_time - start_time
@@ -122,7 +122,6 @@ def map_artwork():
         start_time = time.time()
         base_img_url = data.get("baseImageUrl")
         art_img_url = data.get("artworkUrl")
-        scale = data.get("scale", 1.0)
         rotation = data.get("rotation", 0)
 
         if not base_img_url or not art_img_url:
@@ -141,15 +140,12 @@ def map_artwork():
         h, w = base_img.shape[:2]
         art_layer = np.zeros((h, w, 4), dtype=np.uint8)
 
-        # --- Resize artwork to fit within the base image, preserving aspect ratio ---
-        art_h, art_w = art_img.shape[:2]
-        ratio = min(w / art_w, h / art_h)
-        new_art_w, new_art_h = int(art_w * ratio), int(art_h * ratio)
-        resized_art = cv2.resize(art_img, (new_art_w, new_art_h))
+        # --- Resize artwork to fit the base image dimensions ---
+        resized_art = cv2.resize(art_img, (w, h))
 
         # --- Place resized artwork onto the center of the transparent layer ---
-        x_offset = (w - new_art_w) // 2
-        y_offset = (h - new_art_h) // 2
+        x_offset = 0
+        y_offset = 0
         
         # Create a 4-channel version of the resized artwork if it's 3-channel
         if resized_art.shape[2] == 3:
@@ -157,11 +153,11 @@ def map_artwork():
         else:
             resized_art_bgra = resized_art
 
-        art_layer[y_offset:y_offset+new_art_h, x_offset:x_offset+new_art_w] = resized_art_bgra
+        art_layer[y_offset:y_offset+h, x_offset:x_offset+w] = resized_art_bgra
         
-        # --- Apply scale and rotation transformations ---
+        # --- Apply rotation transformations ---
         center = (w // 2, h // 2)
-        transform_matrix = cv2.getRotationMatrix2D(center, rotation, scale)
+        transform_matrix = cv2.getRotationMatrix2D(center, rotation, 1.0)
         transformed_art_layer = cv2.warpAffine(art_layer, transform_matrix, (w, h))
 
         # --- Blend the transformed artwork with the base image ---
@@ -185,8 +181,21 @@ def map_artwork():
         
         mapped_img_uint8 = np.clip(final_img_float * 255, 0, 255).astype(np.uint8)
 
+        # --- Add Vignette Effect ---
+        vignette_strength = 0.9 # How dark the edges are (0.0=black, 1.0=no change)
+        vignette_smoothness = 1.2 # How gradually it fades (0.1=sharp, 0.7=very smooth)
+        
+        kernel_x = cv2.getGaussianKernel(w, int(w * vignette_smoothness))
+        kernel_y = cv2.getGaussianKernel(h, int(h * vignette_smoothness))
+        kernel = kernel_y * kernel_x.T
+        mask = cv2.normalize(kernel, None, 1.0, vignette_strength, cv2.NORM_MINMAX)
+
+        vignetted_img = np.copy(mapped_img_uint8)
+        for i in range(3):
+            vignetted_img[:, :, i] = vignetted_img[:, :, i] * mask
+        
         # --- Encode and upload ---
-        is_success, buffer = cv2.imencode(".png", mapped_img_uint8)
+        is_success, buffer = cv2.imencode(".png", vignetted_img)
         if not is_success:
             raise InternalServerError("Failed to encode the output image.")
         base64_image = base64.b64encode(buffer).decode("utf-8")
@@ -217,7 +226,6 @@ def map_artwork():
         time_taken = time.time() - start_time
         app.logger.info(f"Image mapping completed in {time_taken:.2f} seconds.")
         return jsonify({
-            "mappedImage": base64_string,
             "s3Url": s3_url,
             "timeTaken": f"{time_taken:.2f} seconds"
         }), 200

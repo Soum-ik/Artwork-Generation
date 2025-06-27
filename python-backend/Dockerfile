@@ -4,6 +4,16 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
+# Install required system dependencies for OpenCV and Pillow
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libgl1 \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy all files
 COPY . .
 

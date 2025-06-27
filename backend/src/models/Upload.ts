@@ -19,6 +19,7 @@ const UploadSchema = new Schema({
   },
   baseImagePath: {
     type: String,
+    required: false,
   },
   prompt: {
     type: String,

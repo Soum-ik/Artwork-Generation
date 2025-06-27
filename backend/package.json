@@ -1,11 +1,15 @@
 {
   "name": "backend",
-  "module": "index.ts",
+  "module": "server.ts",
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "bun run src/index.ts",
-    "dev": "bun run --watch src/index.ts"
+    "start": "bun run src/server.ts",
+    "dev": "bun run --watch src/server.ts",
+    "build": "bun build src/server.ts --outdir=dist --target=bun",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "echo \"Add linting here\"",
+    "health": "curl -f http://localhost:3001/health || exit 1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
@@ -21,6 +25,8 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.837.0",
+    "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

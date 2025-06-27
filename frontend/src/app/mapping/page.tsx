@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Slider } from "@/components/ui/slider";
-import { RotateCw, ZoomIn } from "lucide-react";
+import { RotateCw } from "lucide-react";
 import Image from "next/image";
 import { mapArtwork } from "@/lib/api";
 
@@ -15,7 +15,7 @@ const MappingEditor = () => {
   const [isLoading, setIsLoading] = useState(false);
   console.log(artworkUrl, baseImageUrl);
 
-  const [scale, setScale] = useState(1);
+  const [scale] = useState(1);
   const [rotation, setRotation] = useState(0);
 
   const uploadedArtworkUrl = artworkUrl;
@@ -99,23 +99,6 @@ const MappingEditor = () => {
           <div className="space-y-8">
             <div>
               <label className="flex items-center gap-2 mb-3 text-lg">
-                <ZoomIn className="w-6 h-6" />
-                Scale
-              </label>
-              <Slider
-                defaultValue={[1]}
-                value={[scale]}
-                onValueChange={(value: number[]) => setScale(value[0])}
-                min={0.1}
-                max={3}
-                step={0.05}
-              />
-              <div className="text-right text-sm text-foreground/70 mt-1">
-                {scale.toFixed(2)}x
-              </div>
-            </div>
-            <div>
-              <label className="flex items-center gap-2 mb-3 text-lg">
                 <RotateCw className="w-6 h-6" />
                 Rotation
               </label>
@@ -126,6 +109,7 @@ const MappingEditor = () => {
                 min={-180}
                 max={180}
                 step={1}
+                className="w-full bg-amber-50"
               />
               <div className="text-right text-sm text-foreground/70 mt-1">
                 {rotation.toFixed(0)}°

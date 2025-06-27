@@ -7,9 +7,37 @@ import { UploadCloud, File as FileIcon, X } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { uploadArtwork } from "@/lib/api";
 
+interface LoadingStage {
+  message: string;
+  description: string;
+}
+
+const loadingStages: LoadingStage[] = [
+  {
+    message: "Uploading your artwork...",
+    description: "Securely storing your image to cloud storage",
+  },
+  {
+    message: "Generating base texture...",
+    description:
+      "AI is creating realistic paper texture (this may take 8-10 seconds)",
+  },
+  {
+    message: "Processing final image...",
+    description: "Optimizing and preparing your artwork for mapping",
+  },
+  {
+    message: "Almost done...",
+    description: "Finalizing everything for the mapping interface",
+  },
+];
+
 const UploadPage = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState("");
+
   const router = useRouter();
 
   const onDrop = (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
@@ -51,17 +79,43 @@ const UploadPage = () => {
     }
 
     setIsLoading(true);
+    setLoadingStage(0);
+    setLoadingMessage(loadingStages[0].message);
+
+    // Start progressive loading stages
+    const stageTimer = setInterval(() => {
+      setLoadingStage((prev) => {
+        const nextStage = prev + 1;
+        if (nextStage < loadingStages.length) {
+          setLoadingMessage(loadingStages[nextStage].message);
+          return nextStage;
+        }
+        return prev;
+      });
+    }, 3500); // Change stage every 3.5 seconds
+
     try {
-      await uploadArtwork(file, token);
+      const response = await uploadArtwork(file, token);
+      clearInterval(stageTimer);
+
       toast.success("File uploaded successfully! Redirecting...");
-      // TODO: Pass upload ID to mapping page
-      router.push("/mapping");
+
+      const { artworkUrl, baseImageUrl } = response.upload;
+      router.push(
+        `/mapping?artworkUrl=${encodeURIComponent(
+          artworkUrl
+        )}&baseImageUrl=${encodeURIComponent(baseImageUrl)}`
+      );
     } catch (error) {
+      clearInterval(stageTimer);
+
       const message =
         error instanceof Error ? error.message : "An unknown error occurred";
       toast.error(`Upload failed: ${message}`);
     } finally {
       setIsLoading(false);
+      setLoadingStage(0);
+      setLoadingMessage("");
     }
   };
 
@@ -125,12 +179,40 @@ const UploadPage = () => {
             </div>
           )}
 
+          {isLoading && (
+            <div className=" mt-4">
+              <div className="flex items-center justify-center space-x-4">
+                {/* <Loader2 className="w-6 h-6 animate-spin text-brand-primary" /> */}
+                <div className="text-center">
+                  <p className="font-semibold text-lg">
+                    {loadingMessage || loadingStages[0].message}
+                  </p>
+                  <p className="text-sm text-foreground/70">
+                    {loadingStages[loadingStage]?.description}
+                  </p>
+                  <div className="mt-2 w-48 bg-foreground/20 rounded-full h-2">
+                    <div
+                      className="bg-brand-primary h-2 rounded-full transition-all duration-1000 ease-out"
+                      style={{
+                        width: `${
+                          ((loadingStage + 1) / loadingStages.length) * 100
+                        }%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <button
             onClick={handleContinue}
             disabled={!file || isLoading}
-            className="mt-8 bg-brand-primary text-brand-secondary font-bold py-3 px-8 rounded-full hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`mt-8 bg-brand-primary text-brand-secondary font-bold py-3 px-8 rounded-full hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed ${
+              isLoading ? "hidden" : ""
+            }`}
           >
-            {isLoading ? "Uploading..." : "Continue"}
+            Continue
           </button>
         </div>
       </div>

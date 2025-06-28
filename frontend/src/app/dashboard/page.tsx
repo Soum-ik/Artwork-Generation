@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Download, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation'; 
 import { Toaster, toast } from 'sonner';
 import { getUserUploads } from '@/lib/api';
 import Image from 'next/image';
@@ -46,13 +45,8 @@ const DashboardPage = () => {
     fetchUploads();
   }, [router]);
 
-  // TODO: Implement delete functionality
-  const handleDelete = (id: string) => {
-    console.log('Delete:', id);
-    toast.info('Delete functionality not implemented yet.');
-  };
-
-  const API_URL = 'http://localhost:5000';
+ 
+ 
 
   return (
     <>
@@ -70,21 +64,16 @@ const DashboardPage = () => {
             {uploads.map((upload) => (
               <div key={upload._id} className="glass-card rounded-2xl overflow-hidden group">
                 <div className="relative">
-                  <Image src={`${API_URL}/${upload.originalFilePath.replace(/\\/g, '/')}`} alt="User upload" className="w-full h-48 object-cover" width={500} height={500} />
+                  <Image src={upload.originalFilePath} alt="User upload" className="w-full h-48 object-cover" width={500} height={500} />
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold">{upload.prompt || 'Untitled Artwork'}</h3>
-                  <div className="mt-4 flex justify-end gap-3">
-                    <a href={`${API_URL}/${upload.originalFilePath.replace(/\\/g, '/')}`} download>
-                      <button className="p-2 rounded-full hover:bg-brand-primary/20 transition-colors">
-                        <Download className="w-5 h-5" />
-                      </button>
-                    </a>
+                  {/* <div className="mt-4 flex justify-end gap-3">
                     <button onClick={() => handleDelete(upload._id)} className="p-2 rounded-full hover:bg-red-500/20 text-red-500 transition-colors">
                       <Trash2 className="w-5 h-5" />
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             ))}

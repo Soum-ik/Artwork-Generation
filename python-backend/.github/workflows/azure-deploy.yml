@@ -1,0 +1,80 @@
+name: Build and Deploy to Azure Web App
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  REGISTRY: stacktesting.azurecr.io
+  IMAGE_NAME: art-mapper-api
+  WEBAPP_NAME: test-load
+  RESOURCE_GROUP: NoverseApp
+  ACR_NAME: stackTesting
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.REGISTRY }}
+          username: stackTesting
+          password: sEejDWzN5b8MaKs1hvf3ZmAyQUpv5GJDkOOKC+aE/4+ACRCK2pKj
+
+      - name: Build and Push image
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAME:latest .
+          docker push $REGISTRY/$IMAGE_NAME:latest
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.WEBAPP_NAME }}
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Clean up old ACR images
+        run: |
+          # Get digest for 'latest' tag
+          DIGEST_TO_KEEP=$(az acr repository show-manifests \
+            --name ${{ env.ACR_NAME }} \
+            --repository ${{ env.IMAGE_NAME }} \
+            --query "[?tags[?@=='latest']].digest" \
+            --output tsv)
+
+          echo "Keeping latest digest: $DIGEST_TO_KEEP"
+
+          # Get all digests
+          all_digests=$(az acr manifest list-metadata \
+            --registry ${{ env.ACR_NAME }} \
+            --name ${{ env.IMAGE_NAME }} \
+            --query "[].digest" \
+            --output tsv)
+
+          # Loop and delete all except the one tagged 'latest'
+          for digest in $all_digests; do
+            if [ "$digest" != "$DIGEST_TO_KEEP" ]; then
+              echo "Deleting digest: $digest"
+              az acr repository delete \
+                --name ${{ env.ACR_NAME }} \
+                --image ${{ env.IMAGE_NAME }}@$digest \
+                --yes
+            else
+              echo "Keeping digest (tagged 'latest'): $digest"
+            fi
+          done

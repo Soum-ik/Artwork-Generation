@@ -190,16 +190,6 @@ const UploadPage = () => {
                   <p className="text-sm text-foreground/70">
                     {loadingStages[loadingStage]?.description}
                   </p>
-                  <div className="mt-2 w-48 bg-foreground/20 rounded-full h-2">
-                    <div
-                      className="bg-brand-primary h-2 rounded-full transition-all duration-1000 ease-out"
-                      style={{
-                        width: `${
-                          ((loadingStage + 1) / loadingStages.length) * 100
-                        }%`,
-                      }}
-                    />
-                  </div>
                 </div>
               </div>
             </div>

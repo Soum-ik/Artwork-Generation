@@ -98,13 +98,27 @@ const ViewerContent = () => {
             Back to Preview
           </button>
         )}
-
-        <a href={textureUrl} download="mapped-artwork.png">
-          <button className="bg-green-600 text-white font-bold py-3 px-8 rounded-full hover:scale-105 transition-transform">
+        <a
+          href={textureUrl}
+          download="mapped-artwork.png"
+          target="_blank"
+          className="sm:block hidden"
+        >
+          <button className="bg-green-600 text-white  font-bold py-3 px-4 sm:px-8 rounded-full hover:scale-105 transition-transform">
             Download
           </button>
         </a>
       </div>
+      <a
+        target="_blank"
+        href={textureUrl}
+        download="mapped-artwork.png"
+        className="mt-[20px] sm:hidden block"
+      >
+        <button className="bg-green-600 text-white  font-bold py-3 px-4 sm:px-8 rounded-full hover:scale-105 transition-transform">
+          Download
+        </button>
+      </a>
     </>
   );
 };

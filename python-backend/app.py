@@ -91,6 +91,15 @@ def call_hf_space_for_image(prompt: str, negative_prompt: str) -> str:
 
 # --- API Endpoints ---
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for AWS App Runner"""
+    return jsonify({
+        "status": "healthy", 
+        "service": "artwork-mapping-api",
+        "version": "1.0.0"
+    }), 200
+
 @app.route('/api/v1/generate-base-image', methods=['POST'])
 def generate_base_image():
     try:

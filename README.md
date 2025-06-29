@@ -2,10 +2,6 @@
 
 A sophisticated full-stack application that transforms digital artwork into realistic paper textures using advanced AI technology. The system combines traditional web development with cutting-edge artificial intelligence to create stunning visual effects that make digital art appear as if it's printed on crumpled paper.
 
-## 🎨 What It Does
-
-The Artwork Mapping Application takes your digital artwork and applies realistic paper texture effects, creating the illusion that your art is printed on actual crumpled paper. This is achieved through:
-
 - **AI-Generated Paper Textures**: Uses Hugging Face AI models to create realistic crumpled paper backgrounds
 - **Intelligent Image Mapping**: Advanced computer vision algorithms blend artwork with paper textures
 - **Realistic Effects**: Illumination mapping, and rotation for authentic appearance

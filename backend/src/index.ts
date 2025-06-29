@@ -5,7 +5,6 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import apiRoutes from './routes';
-import { redisClient } from './redis/redisConnection';
 
 const app: Express = express();
 
@@ -39,17 +38,6 @@ app.get('/', (req: Request, res: Response) => {
     status: 'healthy'
   });
 });
-
-(async () => {
-  try {
-    const pong = await redisClient.ping();
-    console.log('Redis connected successfully:', pong);
-  } catch (err) {
-    console.error('Redis connection failed:', err);
-  } finally {
-    redisClient.disconnect();
-  }
-})();
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {

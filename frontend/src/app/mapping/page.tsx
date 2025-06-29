@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Slider } from "@/components/ui/slider";
-import { RotateCw } from "lucide-react";
+import { Eye, RotateCw, X } from "lucide-react";
 import Image from "next/image";
 import { mapArtwork } from "@/lib/api";
 import { Toaster, toast } from "sonner";
@@ -14,13 +14,30 @@ const MappingEditor = () => {
   const artworkUrl = searchParams.get("artworkUrl");
   const baseImageUrl = searchParams.get("baseImageUrl");
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImageSrc, setModalImageSrc] = useState("");
+  const [modalImageAlt, setModalImageAlt] = useState("");
   console.log(artworkUrl, baseImageUrl);
+
+  console.log(modalImageSrc, modalImageAlt);
 
   const [scale] = useState(1);
   const [rotation, setRotation] = useState(0);
 
   const uploadedArtworkUrl = artworkUrl;
   const finalBaseImageUrl = baseImageUrl;
+
+  const openModal = (src: string, alt: string) => {
+    setModalImageSrc(src);
+    setModalImageAlt(alt);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalImageSrc("");
+    setModalImageAlt("");
+  };
 
   const handleRemap = async () => {
     if (!artworkUrl || !baseImageUrl) {
@@ -33,7 +50,7 @@ const MappingEditor = () => {
         artworkUrl,
         baseImageUrl,
         scale,
-        rotation        
+        rotation
       );
       console.log(response);
       const mappedImageUrl = response?.s3Url;
@@ -69,16 +86,17 @@ const MappingEditor = () => {
                 <Image
                   src={finalBaseImageUrl}
                   alt="Base"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                   width={500}
                   height={500}
+                  onClick={() => openModal(finalBaseImageUrl, "Base Image")}
                 />
                 <Image
                   src={uploadedArtworkUrl}
                   alt="Artwork"
                   width={500}
                   height={500}
-                  className="absolute top-0 left-0 w-full h-full object-contain transition-transform duration-200"
+                  className="absolute top-0 left-0 w-full h-full object-contain transition-transform duration-200 cursor-pointer hover:opacity-90"
                   style={{
                     transform: `scale(${scale}) rotate(${rotation}deg)`,
                   }}
@@ -98,6 +116,23 @@ const MappingEditor = () => {
 
           {/* Controls Section */}
           <div className="glass-card rounded-2xl p-6">
+            <div className="flex gap-4 mb-6 ">
+              <button
+                onClick={() => openModal(finalBaseImageUrl!, "Base Image")}
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100/10 transition-colors"
+              >
+                <Eye className="w-5 h-5" />
+                <span className="font-medium">Preview base image</span>
+              </button>
+              <button
+                onClick={() => openModal(uploadedArtworkUrl!, "Artwork")} 
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100/10 transition-colors"
+              >
+                <Eye className="w-5 h-5" />
+                <span className="font-medium">Preview artwork image</span>
+              </button>
+            </div>
+
             <h2 className="text-2xl font-bold mb-6">Controls</h2>
             <div className="space-y-8">
               <div>
@@ -131,6 +166,40 @@ const MappingEditor = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[10000000] p-4"
+          onClick={closeModal}
+        >
+          <div className="relative max-w-2xl max-h-[70%] w-full h-full flex items-center justify-center">
+            {/* Close button */}
+            <button
+              onClick={closeModal}
+              className="absolute top-1 right-1 z-10 bg-white bg-opacity-20 hover:bg-opacity-30 text-black p-2 rounded-full transition-all duration-200 backdrop-blur-sm"
+              aria-label="Close modal"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Modal Image */}
+            <div
+              className="relative w-full h-full flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={modalImageSrc}
+                alt={modalImageAlt}
+                width={1200}
+                height={1200}
+                className="max-w-full max-h-full object-contain rounded-lg"
+                // priority
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

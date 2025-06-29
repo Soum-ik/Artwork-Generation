@@ -7,7 +7,6 @@
 - [Understanding the Mapping Process](#understanding-the-mapping-process)
 - [Adjusting Mapping Parameters](#adjusting-mapping-parameters)
 - [3D Visualization Module](#3d-visualization-module)
-- [Managing Your Uploads](#managing-your-uploads)
 - [Troubleshooting](#troubleshooting) 
 
 ---

@@ -8,7 +8,7 @@ The Artwork Mapping Application takes your digital artwork and applies realistic
 
 - **AI-Generated Paper Textures**: Uses Hugging Face AI models to create realistic crumpled paper backgrounds
 - **Intelligent Image Mapping**: Advanced computer vision algorithms blend artwork with paper textures
-- **Realistic Effects**: Illumination mapping, vignetting, and rotation for authentic appearance
+- **Realistic Effects**: Illumination mapping, and rotation for authentic appearance
 - **Cloud Processing**: Scalable architecture with AWS S3 and Azure deployment
 
 ## 📚 Documentation
@@ -20,8 +20,6 @@ This project includes comprehensive documentation designed for different audienc
   - Account setup and authentication
   - Step-by-step artwork upload process
   - Understanding mapping parameters
-  - Troubleshooting common issues
-  - Tips for best results
 
 ### 🔧 For Developers
 - **[API Documentation](API_DOCUMENTATION.md)** - Complete API reference
@@ -140,11 +138,7 @@ GRADIO_HF_SPACE_NAME=your-huggingface-space
 
 ## ✨ Key Features
 
-### 🔐 Robust Authentication
-- JWT-based user sessions
-- Secure password hashing with bcrypt
-- Protected API endpoints
-- 24-hour token expiration
+ 
 
 ### 🎯 Intelligent Processing
 - **Graceful Degradation**: System continues working even if AI services fail
@@ -152,17 +146,6 @@ GRADIO_HF_SPACE_NAME=your-huggingface-space
 - **Error Recovery**: Database auto-retry with exponential backoff
 - **Resource Cleanup**: Temporary files always cleaned up
 
-### 🚀 Scalable Architecture
-- **Stateless Design**: Easy horizontal scaling
-- **Cloud Storage**: Unlimited file storage via AWS S3
-- **CDN Ready**: Optimized for content delivery networks
-- **Connection Pooling**: Efficient database connections
-
-### 🛡️ Security & Performance
-- **Rate Limiting**: Prevents abuse and DoS attacks
-- **File Validation**: Strict type and size restrictions
-- **CORS Protection**: Configured for specific origins
-- **Health Monitoring**: Built-in system health checks
 
 ## 📊 Performance Metrics
 
@@ -173,22 +156,10 @@ GRADIO_HF_SPACE_NAME=your-huggingface-space
 - **Database Queries**: < 50ms average response
 
 ## 🔄 Deployment
-
-### Development
-```bash
-# Start all services locally
-npm run dev          # Backend
-python app.py        # AI Service
-npm run dev          # Frontend (separate terminal)
-```
-
-### Production
-```bash
-# Build and deploy
-npm run build        # Backend compilation
-docker build -t app  # Container creation
-# Deploy to Azure Web Apps via GitHub Actions
-```
+- Containerize the application using Docker.
+- Push the Docker image to the Azure Container Registry (ACR).
+- Create an App Service in Azure.
+- Deploy the container by connecting the App Service to the image stored in ACR.
 
 ## 📋 API Endpoints
 
@@ -207,36 +178,6 @@ docker build -t app  # Container creation
 ### System Monitoring
 - `GET /health` - Comprehensive system health check
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Upload Failures**
-- Check file format (JPEG, JPG, PNG only)
-- Verify file size (10MB maximum)
-- Ensure user authentication is valid
-
-**AI Service Timeouts**
-- System automatically uses fallback images
-- Check Hugging Face service status
-- Verify environment variables are set
-
-**Database Connection Issues**
-- System auto-retries every 5 seconds
-- Check MongoDB URI and credentials
-- Ensure database service is running
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -254,8 +195,3 @@ For technical support or questions:
 - Check the [User Guide](USER_GUIDE.md) for usage instructions
 - Review [API Documentation](API_DOCUMENTATION.md) for integration details
 - Read [Technical Overview](TECHNICAL_OVERVIEW.md) for architecture insights
-- Open an issue on GitHub for bug reports or feature requests
-
----
-
-**Ready to transform your digital artwork into stunning paper textures? Get started with the [User Guide](USER_GUIDE.md)!** 🎨✨

@@ -8,8 +8,7 @@
 - [Adjusting Mapping Parameters](#adjusting-mapping-parameters)
 - [3D Visualization Module](#3d-visualization-module)
 - [Managing Your Uploads](#managing-your-uploads)
-- [Troubleshooting](#troubleshooting)
-- [Tips for Best Results](#tips-for-best-results)
+- [Troubleshooting](#troubleshooting) 
 
 ---
 

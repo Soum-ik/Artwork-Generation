@@ -4,9 +4,7 @@ import Upload from "../models/Upload";
 import { uploadFileToS3, uploadBufferToS3 } from "../utils/sendFiletoS3";
 import axios from "axios";
 import fs from "fs";
-
-// Fallback base image URL when all other options fail //because sometime hugging face guiod client api is not working so we are using this fallback url
-const FALLBACK_BASE_IMAGE_URL = "https://artwork-testing.s3.ap-south-1.amazonaws.com/base-image-1751145561950.webp";
+import { FALLBACK_BASE_IMAGE_URL } from "../config/config";
 
 export const uploadArtwork = async (
   req: AuthRequest,

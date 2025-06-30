@@ -6,6 +6,8 @@ import { useDropzone, FileRejection } from "react-dropzone";
 import { UploadCloud, File as FileIcon, X } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { uploadArtwork } from "@/lib/api";
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
 interface LoadingStage {
   message: string;
@@ -146,12 +148,19 @@ const UploadPage = () => {
             <div className="glass-card p-8 rounded-2xl flex flex-col items-center justify-center text-center">
               <FileIcon className="w-16 h-16 text-brand-primary mb-4" />
               <p className="font-semibold">{file.name}</p>
-              <p className="text-sm text-foreground/70">
+              <Image
+                src={URL.createObjectURL(file)}
+                alt={file.name}
+                width={100}
+                height={100}
+                className="rounded-lg mt-4"
+              />
+              <p className="text-sm text-foreground/70 mt-2">
                 {(file.size / 1024 / 1024).toFixed(2)} MB
               </p>
               <button
                 onClick={removeFile}
-                className="mt-4 text-red-500 hover:text-red-400"
+                className="mt-4 text-red-500 hover:text-red-400 cursor-pointer"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -182,8 +191,8 @@ const UploadPage = () => {
           {isLoading && (
             <div className=" mt-4">
               <div className="flex items-center justify-center space-x-4">
-                {/* <Loader2 className="w-6 h-6 animate-spin text-brand-primary" /> */}
-                <div className="text-center">
+                <div className="text-center flex flex-col items-center mt-[10px]">
+                  <Loader2 className="w-6 h-6 animate-spin flex-shrink-0 text-brand-primary mb-2" />
                   <p className="font-semibold text-lg">
                     {loadingMessage || loadingStages[0].message}
                   </p>
